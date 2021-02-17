@@ -7,14 +7,14 @@ require("dotenv").config();
 const usersRouter = require("./routes/users");
 const groupsRouter = require("./routes/groups");
 
+const app = express();
+const port = process.env.PORT || 3000;
+
 app.use(cors());
 app.use(express.json());
 
 app.use("/users", usersRouter);
 app.use("/groups", groupsRouter);
-
-const app = express();
-const port = process.env.PORT || 3000;
 
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING, {

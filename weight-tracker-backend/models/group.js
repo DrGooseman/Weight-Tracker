@@ -11,9 +11,7 @@ const groupSchema = new Schema(
       trim: true,
       minlength: 3,
     },
-    users: [
-      { userId: { type: Schema.Types.ObjectId, required: true, ref: "user" } },
-    ],
+    users: [{ type: Schema.Types.ObjectId, required: true, ref: "User" }],
   },
   {
     timestamps: true,
