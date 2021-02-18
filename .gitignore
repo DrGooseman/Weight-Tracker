@@ -12,11 +12,12 @@
 
 # production
 /build
-FrontEnd/build
+/weight-tracker-frontend/build
 
 # misc
 /weight-tracker-backend/.env*
 /weight-tracker-frontend/.env*
+**/.env*
 .DS_Store
 .env.local
 .env.development.local
