@@ -13,12 +13,12 @@ router.get("/", async (req, res) => {
   return res.json(users);
 });
 
-router.post("/add", (req, res) => {
+router.post("/add", async (req, res) => {
   const username = req.body.username;
   const newUser = new User({ username, weightEntries: [] });
 
   try {
-    newUser.save();
+    await newUser.save();
   } catch (err) {
     return res.status(500).json("Error: " + err);
   }

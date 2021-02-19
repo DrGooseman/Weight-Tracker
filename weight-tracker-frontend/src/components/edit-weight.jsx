@@ -2,7 +2,7 @@ import React,  { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from "react-router-dom";
-
+import axios from "axios";
 
 
 function EditWeight() {
@@ -13,8 +13,13 @@ function EditWeight() {
         setWeight(event.target.value);
       }
 
-      function onsubmit() {
-        console.log(weight);
+      async function onsubmit() {
+        const data = {
+            weight,
+            date
+        }
+      const result = await axios.post('http://localhost:5000/users/weight', data);
+      console.log(result.data);
     }
 
 return (

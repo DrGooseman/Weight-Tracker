@@ -26,13 +26,13 @@ router.get("/:groupId", async (req, res) => {
   return res.json(group);
 });
 
-router.post("/add", (req, res) => {
+router.post("/add", async (req, res) => {
   const name = req.body.name;
   const userId = req.body.userId;
   const newGroup = new Group({ name, users: [{ _id: userId }] });
 
   try {
-    newGroup.save();
+    await newGroup.save();
   } catch (err) {
     return res.status(500).json("Error: " + err);
   }
