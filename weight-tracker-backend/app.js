@@ -16,8 +16,13 @@ app.use(express.json());
 app.use("/users", usersRouter);
 app.use("/groups", groupsRouter);
 
+const DBConnectionString =
+  process.env.NODE_ENV === "test"
+    ? process.env.TEST_MONGO_CONNECTION_STRING
+    : process.env.MONGO_CONNECTION_STRING;
+
 mongoose
-  .connect(process.env.MONGO_CONNECTION_STRING, {
+  .connect(DBConnectionString, {
     useNewUrlParser: true,
     useCreateIndex: true,
   })
@@ -27,3 +32,5 @@ mongoose
     })
   )
   .catch((err) => console.log(err));
+
+module.exports = app; // for testing
