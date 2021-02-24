@@ -27,9 +27,12 @@ router.post("/signup", async (req, res) => {
   const token = user.generateAuthToken();
 
   return res.status(201).json({
-    _id: newUser._id,
-    username: newUser.username,
-    weightEntries: [],
+    message: "User created!",
+    user: {
+      _id: newUser._id,
+      username: newUser.username,
+      weightEntries: [],
+    },
     token,
   });
 });
@@ -53,9 +56,12 @@ router.post("/weight", auth, async (req, res) => {
   }
 
   return res.status(201).json({
-    _id: user._id,
-    username: user.username,
-    weightEntries: user.weightEntries,
+    message: "Weight posted!",
+    user: {
+      _id: user._id,
+      username: user.username,
+      weightEntries: user.weightEntries,
+    },
   });
 });
 
