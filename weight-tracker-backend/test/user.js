@@ -23,16 +23,12 @@ describe("Users", () => {
    * Test the /GET route
    */
   describe("/GET users", () => {
-    it("it should GET all the users", (done) => {
-      chai
-        .request(server)
-        .get("/users")
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a("array");
-          res.body.length.should.be.eql(0);
-          done();
-        });
+    it("it should GET all the users", async () => {
+      res = await chai.request(server).get("/users");
+
+      res.should.have.status(200);
+      res.body.should.be.a("array");
+      res.body.length.should.be.eql(0);
     });
   });
 
@@ -40,24 +36,32 @@ describe("Users", () => {
    * Test the /POST route
    */
   describe("/POST user", () => {
-    it("it should POST a user ", (done) => {
+    it("it should POST a user ", async () => {
       let username = "Mr. Beans";
       let user = {
         username,
       };
-      chai
-        .request(server)
-        .post("/users")
-        .send(user)
-        .end((err, res) => {
-          res.should.have.status(201);
-          res.body.should.be.a("object");
-          res.body.should.have.property("message").eql("User created!");
-          res.body.user.should.have.property("_id");
-          res.body.user.should.have.property("username").eql(username);
-          res.body.user.should.have.property("weightEntries").eql([]);
-          done();
-        });
+      res = await chai.request(server).post("/users").send(user);
+
+      res.should.have.status(201);
+      res.body.should.be.a("object");
+      res.body.should.have.property("message").eql("User created!");
+      res.body.user.should.have.property("_id");
+      res.body.user.should.have.property("username").eql(username);
+      res.body.user.should.have.property("weightEntries").eql([]);
+    });
+    it("it should not POST a user with a duplicate username", async () => {
+      let username = "Mr. Beans";
+      let user = {
+        username,
+      };
+      await chai.request(server).post("/users").send(user);
+
+      res = await chai.request(server).post("/users").send(user);
+
+      res.should.have.status(400);
+      res.body.should.be.a("object");
+      res.body.should.have.property("message").eql("Username already in use.");
     });
   });
 });
