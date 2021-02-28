@@ -35,4 +35,29 @@ describe("Users", () => {
         });
     });
   });
+
+  /*
+   * Test the /POST route
+   */
+  describe("/POST user", () => {
+    it("it should POST a user ", (done) => {
+      let username = "Mr. Beans";
+      let user = {
+        username,
+      };
+      chai
+        .request(server)
+        .post("/users")
+        .send(user)
+        .end((err, res) => {
+          res.should.have.status(201);
+          res.body.should.be.a("object");
+          res.body.should.have.property("message").eql("User created!");
+          res.body.user.should.have.property("_id");
+          res.body.user.should.have.property("username").eql(username);
+          res.body.user.should.have.property("weightEntries").eql([]);
+          done();
+        });
+    });
+  });
 });

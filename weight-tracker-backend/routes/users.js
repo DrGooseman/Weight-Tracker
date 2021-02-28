@@ -14,12 +14,18 @@ router.get("/", async (req, res) => {
   return res.json(users);
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/", async (req, res) => {
   const username = req.body.username;
-  const newUser = new User({ username, weightEntries: [] });
+
+  let user = await User.findOne({ username });
+
+  if (user)
+    return res.status(400).send({ message: "Username already in use." });
+
+  user = new User({ username, weightEntries: [] });
 
   try {
-    await newUser.save();
+    await user.save();
   } catch (err) {
     return res.status(500).json("Error: " + err);
   }
@@ -29,9 +35,9 @@ router.post("/signup", async (req, res) => {
   return res.status(201).json({
     message: "User created!",
     user: {
-      _id: newUser._id,
-      username: newUser.username,
-      weightEntries: [],
+      _id: user._id,
+      username: user.username,
+      weightEntries: user.weightEntries,
     },
     token,
   });
