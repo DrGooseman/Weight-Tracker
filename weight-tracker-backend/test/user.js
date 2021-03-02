@@ -7,6 +7,7 @@ let User = require("../models/user");
 //Require the dev-dependencies
 let chai = require("chai");
 let chaiHttp = require("chai-http");
+const jwt = require("jsonwebtoken");
 let server = require("../app");
 let should = chai.should();
 
@@ -49,6 +50,14 @@ describe("Users", () => {
       res.body.user.should.have.property("_id");
       res.body.user.should.have.property("username").eql(username);
       res.body.user.should.have.property("weightEntries").eql([]);
+      res.body.should.have.property("token");
+
+      const decodedToken = jwt.verify(
+        res.body.token,
+        process.env.JWT_PRIVATE_KEY
+      );
+
+      decodedToken.should.have.property("_id").eql(res.body.user._id);
     });
     it("it should not POST a user with a duplicate username", async () => {
       let username = "Mr. Beans";

@@ -31,6 +31,8 @@ router.post("/", async (req, res) => {
   }
 
   const token = user.generateAuthToken();
+  console.log("token");
+  console.log(token);
 
   return res.status(201).json({
     message: "User created!",
