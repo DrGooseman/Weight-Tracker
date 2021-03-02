@@ -8,6 +8,7 @@ let User = require("../models/user");
 let chai = require("chai");
 let chaiHttp = require("chai-http");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 let server = require("../app");
 let should = chai.should();
 
@@ -38,10 +39,13 @@ describe("Users", () => {
    */
   describe("/POST user", () => {
     it("it should POST a user ", async () => {
-      let username = "Mr. Beans";
+      const username = "Mr. Beans";
+      const password = "password123";
       let user = {
         username,
+        password,
       };
+
       res = await chai.request(server).post("/users").send(user);
 
       res.should.have.status(201);
@@ -49,6 +53,7 @@ describe("Users", () => {
       res.body.should.have.property("message").eql("User created!");
       res.body.user.should.have.property("_id");
       res.body.user.should.have.property("username").eql(username);
+      res.body.user.should.not.have.property("password");
       res.body.user.should.have.property("weightEntries").eql([]);
       res.body.should.have.property("token");
 
@@ -58,11 +63,18 @@ describe("Users", () => {
       );
 
       decodedToken.should.have.property("_id").eql(res.body.user._id);
+
+      const userInDb = await User.findById(res.body.user._id);
+      userInDb.should.not.be.null;
+      const isValidPassword = await bcrypt.compare(password, userInDb.password);
+      isValidPassword.should.be.true;
     });
     it("it should not POST a user with a duplicate username", async () => {
       let username = "Mr. Beans";
+      const password = "password123";
       let user = {
         username,
+        password,
       };
       await chai.request(server).post("/users").send(user);
 

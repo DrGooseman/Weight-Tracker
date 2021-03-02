@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/user");
 const auth = require("../middleware/auth");
@@ -16,13 +17,17 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const username = req.body.username;
+  let password = req.body.password;
 
   let user = await User.findOne({ username });
 
   if (user)
     return res.status(400).send({ message: "Username already in use." });
 
-  user = new User({ username, weightEntries: [] });
+  const salt = await bcrypt.genSalt(10);
+  password = await bcrypt.hash(password, salt);
+
+  user = new User({ username, password, weightEntries: [] });
 
   try {
     await user.save();
