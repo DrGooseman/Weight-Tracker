@@ -22,9 +22,9 @@ describe("Users", () => {
     });
   });
   /*
-   * Test the /GET route
+   * Test GET /user
    */
-  describe("/GET users", () => {
+  describe("GET /users", () => {
     it("it should GET all the users", async () => {
       res = await chai.request(server).get("/users");
 
@@ -35,9 +35,9 @@ describe("Users", () => {
   });
 
   /*
-   * Test the /POST route
+   * Test POST /user
    */
-  describe("/POST user", () => {
+  describe("POST /user", () => {
     it("it should POST a user ", async () => {
       const username = "Mr. Beans";
       const password = "password123";
@@ -51,6 +51,7 @@ describe("Users", () => {
       res.should.have.status(201);
       res.body.should.be.a("object");
       res.body.should.have.property("message").eql("User created!");
+      res.body.should.have.property("user");
       res.body.user.should.have.property("_id");
       res.body.user.should.have.property("username").eql(username);
       res.body.user.should.not.have.property("password");
@@ -83,6 +84,73 @@ describe("Users", () => {
       res.should.have.status(400);
       res.body.should.be.a("object");
       res.body.should.have.property("message").eql("Username already in use.");
+    });
+  });
+
+  /*
+   * Test POST /user/login
+   */
+  describe("POST /user/login", () => {
+    it("it should login a user", async () => {
+      const username = "Mr. Beans";
+      const password = "password123";
+      let user = {
+        username,
+        password,
+      };
+
+      // create the initial user so we can test loggin in after
+      await chai.request(server).post("/users").send(user);
+
+      res = await chai.request(server).post("/users/login").send(user);
+
+      res.should.have.status(200);
+      res.body.should.be.a("object");
+      res.body.should.have.property("message").eql("Login successful!");
+      res.body.should.have.property("user");
+      res.body.user.should.have.property("_id");
+      res.body.user.should.have.property("username").eql(username);
+      res.body.user.should.not.have.property("password");
+      res.body.user.should.have.property("weightEntries").eql([]);
+      res.body.should.have.property("token");
+    });
+    it("it should not login a user with an incorrect password", async () => {
+      const username = "Mr. Beans";
+      const password = "password123";
+      let user = {
+        username,
+        password,
+      };
+
+      // create the initial user so we can test loggin in after
+      await chai.request(server).post("/users").send(user);
+
+      user.password = "IncorrectPassword";
+
+      res = await chai.request(server).post("/users/login").send(user);
+
+      res.should.have.status(403);
+      res.body.should.be.a("object");
+      res.body.should.have.property("message").eql("Password is incorrect.");
+    });
+    it("it should not login a non-existing user", async () => {
+      const username = "Mr. Beans";
+      const password = "password123";
+      let user = {
+        username,
+        password,
+      };
+
+      // create the initial user so we can test loggin in after
+      await chai.request(server).post("/users").send(user);
+
+      user.username = "Angela Merkel";
+
+      res = await chai.request(server).post("/users/login").send(user);
+
+      res.should.have.status(404);
+      res.body.should.be.a("object");
+      res.body.should.have.property("message").eql("User not found.");
     });
   });
 });

@@ -36,11 +36,43 @@ router.post("/", async (req, res) => {
   }
 
   const token = user.generateAuthToken();
-  console.log("token");
-  console.log(token);
 
   return res.status(201).json({
     message: "User created!",
+    user: {
+      _id: user._id,
+      username: user.username,
+      weightEntries: user.weightEntries,
+    },
+    token,
+  });
+});
+
+router.post("/login", async (req, res) => {
+  let user;
+
+  try {
+    user = await User.findOne({ username: req.body.username });
+  } catch (err) {
+    return res.status(500).send({ message: "Login failed, try again later." });
+  }
+
+  if (!user) return res.status(404).send({ message: "User not found." });
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(req.body.password, user.password);
+  } catch (err) {
+    return res.status(500).send({ message: "Login failed, try again later." });
+  }
+
+  if (!isValidPassword)
+    return res.status(403).send({ message: "Password is incorrect." });
+
+  const token = user.generateAuthToken();
+
+  res.json({
+    message: "Login successful!",
     user: {
       _id: user._id,
       username: user.username,
